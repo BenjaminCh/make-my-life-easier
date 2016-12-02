@@ -41,7 +41,6 @@ func hmacSum(hmac hash.Hash, buf []byte) []byte {
 func Encrypt(encryptionKey, integrityKey, seed string, price float64, scaleFactor float64, isDebugMode bool) string {
 	encodingFun, _ := createHmac(encryptionKey)
 	integrityFun, _ := createHmac(integrityKey)
-	data := applyScaleFactor(price, scaleFactor, isDebugMode)
 
 	// Result
 	var (
@@ -49,6 +48,15 @@ func Encrypt(encryptionKey, integrityKey, seed string, price float64, scaleFacto
 		encoded   [8]byte
 		signature [4]byte
 	)
+
+	if isDebugMode == true {
+		fmt.Println("Encryption key : ", encryptionKey)
+		fmt.Println("Encryption key (bytes) : ", []byte(encryptionKey))
+		fmt.Println("Integrity key : ", integrityKey)
+		fmt.Println("Integrity key (bytes) : ", []byte(integrityKey))
+	}
+
+	data := applyScaleFactor(price, scaleFactor, isDebugMode)
 
 	// Create Initialization Vector from seed
 	sum := md5.Sum([]byte(seed))
