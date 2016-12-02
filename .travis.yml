@@ -1,11 +1,5 @@
 language: go
-sudo: false
+
 go:
   - 1.7
-  - tip
-
-before_install:
-  - go get -t -v ./...
-
-script:
-  - go test -v ./...
+  - master
