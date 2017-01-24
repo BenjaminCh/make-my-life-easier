@@ -11,6 +11,7 @@ import (
 	"hash"
 	"flag"
 	"time"
+	"strconv"
 )
 
 func applyScaleFactor(price float64, scaleFactor float64, isDebugMode bool) [8]byte {
@@ -139,9 +140,10 @@ func main() {
 	var encryptionKey = flag.String("encryptionkey", "", "Encryption key")
 	var integrityKey = flag.String("integritykey", "", "Integrity key")
 	var initializationVector = flag.String("seed", fmt.Sprintf("%d", time.Now()), "Seed for initialization vector, default is current timestamp")
-	var priceToEncrypt = flag.Float64("price", 0, "Price to encrypt, default = 0.0")
+	var priceToEncrypt = flag.String("price", "0", "Price to encrypt, default = 0.0")
 	var scaleFactor = flag.Float64("scalefactor", 1000000, "What scale factor to apply on the price for encryption? Default is micros (1000000)")
 	var debug = flag.Bool("debug", false, "Debug traces for middle steps, default = false")
+	var mode = flag.String("mode", "all", "Specify what to do: 'all' : encrypt / decrypt, 'encrypt' : encrypt only, 'decrypt' : decrypt only")
 	flag.Parse()
 
 	if *encryptionKey == "" {
@@ -152,16 +154,29 @@ func main() {
 		fmt.Println("Integrity Key is mandatory !")
 		return
 	}
-	if *priceToEncrypt < 0 {
-		fmt.Println("Price to encrypt cannot be negative !")
+	if !(*mode == "all" || *mode == "decrypt" || *mode == "encrypt") {
+		fmt.Println("Mode should be either : 'all', 'encrypt' or 'decrypt'")
 		return
 	}
 
-	fmt.Println(fmt.Sprintf("Initial price: %f", *priceToEncrypt))
+	var encryptedPrice string 
+	fmt.Println(fmt.Sprintf("Initial price: %s", *priceToEncrypt))
 
-	encryptedPrice := Encrypt(*encryptionKey, *integrityKey, *initializationVector, *priceToEncrypt, *scaleFactor, *debug)
-	fmt.Println("Encrypted price:", encryptedPrice)
+	if *mode == "all" || *mode == "encrypt" {
+		price, err := strconv.ParseFloat(*priceToEncrypt, 64)
+		if err != nil {
+			fmt.Println("Error trying to parse price to encrypt, cannot convert %s to float.", *priceToEncrypt)
+			return
+		}
+		encryptedPrice = Encrypt(*encryptionKey, *integrityKey, *initializationVector, price, *scaleFactor, *debug)
+		fmt.Println("Encrypted price:", encryptedPrice)
+	}
 
-	decryptedPrice := Decrypt(*encryptionKey, *integrityKey, encryptedPrice, *scaleFactor)
-	fmt.Println("Decrypted price:", decryptedPrice)
+	if *mode == "all" || *mode == "decrypt" {
+		if encryptedPrice == "" && *mode == "decrypt" {
+			encryptedPrice = (*priceToEncrypt)[:]
+		}
+		decryptedPrice := Decrypt(*encryptionKey, *integrityKey, encryptedPrice, *scaleFactor)
+		fmt.Println("Decrypted price:", decryptedPrice)
+	}
 }
