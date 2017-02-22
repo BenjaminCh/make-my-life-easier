@@ -24,7 +24,7 @@ func main() {
 	fmt.Println("*** Generated key ***")
 	fmt.Println("")
 	fmt.Println("Key (hex format) : ", fmt.Sprintf("%x", key))
-	fmt.Println("Key (byte array format) : ", key)
+	fmt.Println("Key (byte array format) : ", []byte(fmt.Sprintf("%x", key)))
 	fmt.Println("")
 	fmt.Println("*********************")
 }
