@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"flag"
 	"crypto/rand"
+	"encoding/hex"
 )
 
 func main() {
@@ -18,13 +19,14 @@ func main() {
 		fmt.Println("Error creating the key : ", err)
 		return
 	}
+	keyHexa, _ := hex.DecodeString(fmt.Sprintf("%x", key))
 
 	fmt.Println("")
 	fmt.Println("")
 	fmt.Println("*** Generated key ***")
 	fmt.Println("")
 	fmt.Println("Key (hex format) : ", fmt.Sprintf("%x", key))
-	fmt.Println("Key (byte array format) : ", []byte(fmt.Sprintf("%x", key)))
+	fmt.Println("Key (byte array format) : ", []byte(keyHexa))
 	fmt.Println("")
 	fmt.Println("*********************")
 }

@@ -52,9 +52,11 @@ func Encrypt(encryptionKey, integrityKey, seed string, price float64, scaleFacto
 
 	if isDebugMode == true {
 		fmt.Println("Encryption key : ", encryptionKey)
-		fmt.Println("Encryption key (bytes) : ", []byte(encryptionKey))
+		encryptionKeyHexa, _ := hex.DecodeString(encryptionKey)
+		fmt.Println("Encryption key (bytes) : ", []byte(encryptionKeyHexa))
 		fmt.Println("Integrity key : ", integrityKey)
-		fmt.Println("Integrity key (bytes) : ", []byte(integrityKey))
+		integrityKeyHexa, _ := hex.DecodeString(integrityKey)
+		fmt.Println("Integrity key (bytes) : ", []byte(integrityKeyHexa))
 	}
 
 	data := applyScaleFactor(price, scaleFactor, isDebugMode)
