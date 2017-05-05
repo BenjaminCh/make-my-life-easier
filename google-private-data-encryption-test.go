@@ -12,6 +12,7 @@ import (
 	"flag"
 	"time"
 	"strconv"
+	"strings"
 )
 
 func applyScaleFactor(price float64, scaleFactor float64, isDebugMode bool) [8]byte {
@@ -161,24 +162,37 @@ func main() {
 		return
 	}
 
-	var encryptedPrice string 
-	fmt.Println(fmt.Sprintf("Initial price: %s", *priceToEncrypt))
+	var priceToEncryptTrimed string
+	var pricesToTest []string
 
-	if *mode == "all" || *mode == "encrypt" {
-		price, err := strconv.ParseFloat(*priceToEncrypt, 64)
-		if err != nil {
-			fmt.Println("Error trying to parse price to encrypt, cannot convert %s to float.", *priceToEncrypt)
-			return
-		}
-		encryptedPrice = Encrypt(*encryptionKey, *integrityKey, *initializationVector, price, *scaleFactor, *debug)
-		fmt.Println("Encrypted price:", encryptedPrice)
+	priceToEncryptTrimed = strings.Replace(*priceToEncrypt, " ", "", -1)
+	if strings.Contains(priceToEncryptTrimed, ",") {
+		pricesToTest = strings.Split(priceToEncryptTrimed, ",")
+	} else {
+		pricesToTest = []string{priceToEncryptTrimed}
 	}
 
-	if *mode == "all" || *mode == "decrypt" {
-		if encryptedPrice == "" && *mode == "decrypt" {
-			encryptedPrice = (*priceToEncrypt)[:]
+	var encryptedPrice string 
+	for _, priceToTest := range pricesToTest {
+		
+		fmt.Println(fmt.Sprintf("\nInitial price: %s", priceToTest))
+
+		if *mode == "all" || *mode == "encrypt" {
+			price, err := strconv.ParseFloat(priceToTest, 64)
+			if err != nil {
+				fmt.Println("Error trying to parse price to encrypt, cannot convert %s to float.", priceToTest)
+				return
+			}
+			encryptedPrice = Encrypt(*encryptionKey, *integrityKey, *initializationVector, price, *scaleFactor, *debug)
+			fmt.Println("Encrypted price:", encryptedPrice)
 		}
-		decryptedPrice := Decrypt(*encryptionKey, *integrityKey, encryptedPrice, *scaleFactor)
-		fmt.Println("Decrypted price:", decryptedPrice)
+
+		if *mode == "all" || *mode == "decrypt" {
+			if encryptedPrice == "" && *mode == "decrypt" {
+				encryptedPrice = priceToTest[:]
+			}
+			decryptedPrice := Decrypt(*encryptionKey, *integrityKey, encryptedPrice, *scaleFactor)
+			fmt.Println("Decrypted price:", decryptedPrice)
+		}
 	}
 }
