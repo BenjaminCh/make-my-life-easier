@@ -7,12 +7,12 @@ import (
 	"encoding/base64"
 	"encoding/binary"
 	"encoding/hex"
+	"flag"
 	"fmt"
 	"hash"
-	"flag"
-	"time"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func applyScaleFactor(price float64, scaleFactor float64, isDebugMode bool) [8]byte {
@@ -172,9 +172,9 @@ func main() {
 		pricesToTest = []string{priceToEncryptTrimed}
 	}
 
-	var encryptedPrice string 
+	var encryptedPrice string
 	for _, priceToTest := range pricesToTest {
-		
+
 		fmt.Println(fmt.Sprintf("\nInitial price: %s", priceToTest))
 
 		if *mode == "all" || *mode == "encrypt" {
@@ -189,7 +189,7 @@ func main() {
 
 		if *mode == "all" || *mode == "decrypt" {
 			if encryptedPrice == "" && *mode == "decrypt" {
-				encryptedPrice = priceToTest[:]
+				encryptedPrice = priceToTest
 			}
 			decryptedPrice := Decrypt(*encryptionKey, *integrityKey, encryptedPrice, *scaleFactor)
 			fmt.Println("Decrypted price:", decryptedPrice)
