@@ -26,8 +26,16 @@ func applyScaleFactor(price float64, scaleFactor float64, isDebugMode bool) [8]b
 	return scaledPrice
 }
 
-func createHmac(key string) (hash.Hash, error) {
-	k, err := hex.DecodeString(key)
+func createHmac(key, keyDecodingMode string) (hash.Hash, error) {
+	var err error
+	var k []byte
+
+	if (keyDecodingMode == "utf-8") {
+		k = []byte(key)
+	} else {
+		k, err = hex.DecodeString(key)
+	}
+	
 	if err != nil {
 		return nil, err
 	}
@@ -40,9 +48,9 @@ func hmacSum(hmac hash.Hash, buf []byte) []byte {
 	return hmac.Sum(nil)
 }
 
-func Encrypt(encryptionKey, integrityKey, seed string, price float64, scaleFactor float64, isDebugMode bool) string {
-	encodingFun, _ := createHmac(encryptionKey)
-	integrityFun, _ := createHmac(integrityKey)
+func Encrypt(encryptionKey, integrityKey, keyDecodingMode, seed string, price float64, scaleFactor float64, isDebugMode bool) string {
+	encodingFun, _ := createHmac(encryptionKey, keyDecodingMode)
+	integrityFun, _ := createHmac(integrityKey, keyDecodingMode)
 
 	// Result
 	var (
@@ -52,6 +60,7 @@ func Encrypt(encryptionKey, integrityKey, seed string, price float64, scaleFacto
 	)
 
 	if isDebugMode == true {
+		fmt.Println("Keys decoding mode : ", keyDecodingMode)
 		fmt.Println("Encryption key : ", encryptionKey)
 		encryptionKeyHexa, _ := hex.DecodeString(encryptionKey)
 		fmt.Println("Encryption key (bytes) : ", []byte(encryptionKeyHexa))
@@ -98,9 +107,9 @@ func Encrypt(encryptionKey, integrityKey, seed string, price float64, scaleFacto
 	return base64.URLEncoding.EncodeToString(append(append(iv[:], encoded[:]...), signature[:]...))
 }
 
-func Decrypt(encryptionKey, integrityKey, encodedPrice string, scaleFactor float64) float64 {
-	encodingFun, _ := createHmac(encryptionKey)
-	integrityFun, _ := createHmac(integrityKey)
+func Decrypt(encryptionKey, integrityKey, keyDecodingMode, encodedPrice string, scaleFactor float64) float64 {
+	encodingFun, _ := createHmac(encryptionKey, keyDecodingMode)
+	integrityFun, _ := createHmac(integrityKey, keyDecodingMode)
 
 	// Decode base64
 	decoded, _ := base64.URLEncoding.DecodeString(encodedPrice)
@@ -142,6 +151,7 @@ func main() {
 	// Getting command line params
 	var encryptionKey = flag.String("encryptionkey", "", "Encryption key")
 	var integrityKey = flag.String("integritykey", "", "Integrity key")
+	var keyDecodingMode = flag.String("keyDecodingMode", "hexa", "Key decoding mode : hexa or utf-8, default is hexa")
 	var initializationVector = flag.String("seed", fmt.Sprintf("%d", time.Now()), "Seed for initialization vector, default is current timestamp")
 	var priceToEncrypt = flag.String("price", "0", "Price to encrypt, default = 0.0")
 	var scaleFactor = flag.Float64("scalefactor", 1000000, "What scale factor to apply on the price for encryption? Default is micros (1000000)")
@@ -155,6 +165,10 @@ func main() {
 	}
 	if *integrityKey == "" {
 		fmt.Println("Integrity Key is mandatory !")
+		return
+	}
+	if !(*keyDecodingMode == "hexa" || *keyDecodingMode == "utf-8") {
+		fmt.Println("KeyDecodingMode should be either : 'hexa' or 'utf-8'")
 		return
 	}
 	if !(*mode == "all" || *mode == "decrypt" || *mode == "encrypt") {
@@ -183,7 +197,7 @@ func main() {
 				fmt.Println("Error trying to parse price to encrypt, cannot convert %s to float.", priceToTest)
 				return
 			}
-			encryptedPrice = Encrypt(*encryptionKey, *integrityKey, *initializationVector, price, *scaleFactor, *debug)
+			encryptedPrice = Encrypt(*encryptionKey, *integrityKey, *keyDecodingMode, *initializationVector, price, *scaleFactor, *debug)
 			fmt.Println("Encrypted price:", encryptedPrice)
 		}
 
@@ -191,7 +205,7 @@ func main() {
 			if encryptedPrice == "" && *mode == "decrypt" {
 				encryptedPrice = priceToTest
 			}
-			decryptedPrice := Decrypt(*encryptionKey, *integrityKey, encryptedPrice, *scaleFactor)
+			decryptedPrice := Decrypt(*encryptionKey, *integrityKey, *keyDecodingMode, encryptedPrice, *scaleFactor)
 			fmt.Println("Decrypted price:", decryptedPrice)
 		}
 	}
