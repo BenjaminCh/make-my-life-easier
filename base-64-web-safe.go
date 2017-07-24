@@ -45,7 +45,7 @@ func main() {
 
     var base64, base64WebSafe string
 
-    if *action == "base64websafe" || *action == "isbase64websafe"{
+    if *action == "base64websafe" || *action == "isbase64websafe" {
         base64 = *base64ToEdit
         base64WebSafe = convertToBase64WebSafe(*base64ToEdit)
     } else if *action == "base64" {
