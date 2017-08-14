@@ -34,9 +34,9 @@ func convertToBase64(base64WebSafe string) (string) {
 func main() {
 
 	// Getting command line params
-	var base64ToEdit = flag.String("value", "", "Base 64 to edit.")
+    var base64ToEdit = flag.String("value", "", "Base 64 to edit.")
     var action = flag.String("action", "base64websafe", "Action to perform: base64websafe, base64 or isbase64websafe. Default : base64websafe")
-	flag.Parse()
+    flag.Parse()
 
     if !(*action == "base64websafe" || *action == "base64" || *action == "isbase64websafe") {
 		fmt.Println("Action should be either : 'base64websafe', 'base64' or 'isbase64websafe'")
