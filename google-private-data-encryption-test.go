@@ -35,7 +35,7 @@ func createHmac(key, keyDecodingMode string) (hash.Hash, error) {
 	} else {
 		k, err = hex.DecodeString(key)
 	}
-	
+
 	if err != nil {
 		return nil, err
 	}
@@ -146,6 +146,18 @@ func Decrypt(encryptionKey, integrityKey, keyDecodingMode, encodedPrice string, 
 	return price
 }
 
+func addBase64Padding(encryptedPrice string) (string) {
+	var base64 string
+
+	base64 = encryptedPrice
+
+	if i := len(base64) % 4; i != 0 {
+		base64 += strings.Repeat("=", 4-i)
+	}
+
+	return base64
+}
+
 func main() {
 
 	// Getting command line params
@@ -203,8 +215,9 @@ func main() {
 
 		if *mode == "all" || *mode == "decrypt" {
 			if encryptedPrice == "" && *mode == "decrypt" {
-				encryptedPrice = priceToTest
+				encryptedPrice = addBase64Padding(priceToTest)
 			}
+			fmt.Println("Encrypted price:", encryptedPrice)
 			decryptedPrice := Decrypt(*encryptionKey, *integrityKey, *keyDecodingMode, encryptedPrice, *scaleFactor)
 			fmt.Println("Decrypted price:", decryptedPrice)
 		}
