@@ -22,3 +22,12 @@ The command line below will generate an hexa key of the desired length (by defau
 go run hex-key-generator.go
 go run hex-key-generator.go --keylength=32
 ```
+
+## Base64 to Base64 web safe
+## Base64 web safe to Base64
+### Usage examples
+The commands lines below will convert a base64 string to a base 64 web safe string and vice versa.
+```
+go run base-64-web-safe.go --action=base64 --value=[YOUR_BASE64_WEBSAFE_STRING]
+go run base-64-web-safe.go --action=base64websafe --value=[YOUR_BASE64_STRING]
+```
