@@ -1,162 +1,14 @@
 package main
 
 import (
-	"crypto/hmac"
-	"crypto/md5"
-	"crypto/sha1"
-	"encoding/base64"
-	"encoding/binary"
-	"encoding/hex"
 	"flag"
 	"fmt"
-	"hash"
 	"strconv"
 	"strings"
 	"time"
+
+	pricers "github.com/benjaminch/openrtb-pricers"
 )
-
-func applyScaleFactor(price float64, scaleFactor float64, isDebugMode bool) [8]byte {
-	scaledPrice := [8]byte{}
-	binary.BigEndian.PutUint64(scaledPrice[:], uint64(price*scaleFactor))
-
-	if isDebugMode == true {
-		fmt.Println(fmt.Sprintf("Micro price bytes: %v", scaledPrice))
-	}
-
-	return scaledPrice
-}
-
-func createHmac(key, keyDecodingMode string) (hash.Hash, error) {
-	var err error
-	var k []byte
-
-	if (keyDecodingMode == "utf-8") {
-		k = []byte(key)
-	} else {
-		k, err = hex.DecodeString(key)
-	}
-
-	if err != nil {
-		return nil, err
-	}
-	return hmac.New(sha1.New, k), nil
-}
-
-func hmacSum(hmac hash.Hash, buf []byte) []byte {
-	hmac.Reset()
-	hmac.Write(buf)
-	return hmac.Sum(nil)
-}
-
-func Encrypt(encryptionKey, integrityKey, keyDecodingMode, seed string, price float64, scaleFactor float64, isDebugMode bool) string {
-	encodingFun, _ := createHmac(encryptionKey, keyDecodingMode)
-	integrityFun, _ := createHmac(integrityKey, keyDecodingMode)
-
-	// Result
-	var (
-		iv        [16]byte
-		encoded   [8]byte
-		signature [4]byte
-	)
-
-	if isDebugMode == true {
-		fmt.Println("Keys decoding mode : ", keyDecodingMode)
-		fmt.Println("Encryption key : ", encryptionKey)
-		encryptionKeyHexa, _ := hex.DecodeString(encryptionKey)
-		fmt.Println("Encryption key (bytes) : ", []byte(encryptionKeyHexa))
-		fmt.Println("Integrity key : ", integrityKey)
-		integrityKeyHexa, _ := hex.DecodeString(integrityKey)
-		fmt.Println("Integrity key (bytes) : ", []byte(integrityKeyHexa))
-	}
-
-	data := applyScaleFactor(price, scaleFactor, isDebugMode)
-
-	// Create Initialization Vector from seed
-	sum := md5.Sum([]byte(seed))
-	copy(iv[:], sum[:])
-	if isDebugMode == true {
-		fmt.Println("Seed : ", seed)
-		fmt.Println("Initialization vector : ", iv)
-	}
-
-	//pad = hmac(e_key, iv), first 8 bytes
-	pad := hmacSum(encodingFun, iv[:])[:8]
-	if isDebugMode == true {
-		fmt.Println("// pad = hmac(e_key, iv), first 8 bytes")
-		fmt.Println("Pad : ", pad)
-	}
-
-	// enc_data = pad <xor> data
-	for i := range data {
-		encoded[i] = pad[i] ^ data[i]
-	}
-	if isDebugMode == true {
-		fmt.Println("// enc_data = pad <xor> data")
-		fmt.Println("Encoded price bytes : ", encoded)
-	}
-
-	// signature = hmac(i_key, data || iv), first 4 bytes
-	sig := hmacSum(integrityFun, append(data[:], iv[:]...))[:4]
-	copy(signature[:], sig[:])
-	if isDebugMode == true {
-		fmt.Println("// signature = hmac(i_key, data || iv), first 4 bytes")
-		fmt.Println("Signature : ", sig)
-	}
-
-	// final_message = WebSafeBase64Encode( iv || enc_price || signature )
-	return base64.URLEncoding.EncodeToString(append(append(iv[:], encoded[:]...), signature[:]...))
-}
-
-func Decrypt(encryptionKey, integrityKey, keyDecodingMode, encodedPrice string, scaleFactor float64) float64 {
-	encodingFun, _ := createHmac(encryptionKey, keyDecodingMode)
-	integrityFun, _ := createHmac(integrityKey, keyDecodingMode)
-
-	// Decode base64
-	decoded, _ := base64.URLEncoding.DecodeString(encodedPrice)
-
-	// Get elements
-	var (
-		iv         [16]byte
-		p          [8]byte
-		signature  [4]byte
-		priceMicro [8]byte
-	)
-	copy(iv[:], decoded[0:16])
-	copy(p[:], decoded[16:24])
-	copy(signature[:], decoded[24:28])
-
-	// pad = hmac(e_key, iv)
-	pad := hmacSum(encodingFun, iv[:])[:8]
-
-	// priceMicro = p <xor> pad
-	for i := range p {
-		priceMicro[i] = pad[i] ^ p[i]
-	}
-
-	// conf_sig = hmac(i_key, data || iv)
-	sig := hmacSum(integrityFun, append(priceMicro[:], iv[:]...))[:4]
-
-	// success = (conf_sig == sig)
-	for i := range sig {
-		if sig[i] != signature[i] {
-			panic("Failed to decrypt")
-		}
-	}
-	price := float64(binary.BigEndian.Uint64(priceMicro[:])) / scaleFactor
-	return price
-}
-
-func addBase64Padding(encryptedPrice string) (string) {
-	var base64 string
-
-	base64 = encryptedPrice
-
-	if i := len(base64) % 4; i != 0 {
-		base64 += strings.Repeat("=", 4-i)
-	}
-
-	return base64
-}
 
 func main() {
 
@@ -179,9 +31,12 @@ func main() {
 		fmt.Println("Integrity Key is mandatory !")
 		return
 	}
+	var keyDecoding pricers.KeyDecodingMode
 	if !(*keyDecodingMode == "hexa" || *keyDecodingMode == "utf-8") {
 		fmt.Println("KeyDecodingMode should be either : 'hexa' or 'utf-8'")
 		return
+	} else {
+		keyDecoding = *keyDecodingMode
 	}
 	if !(*mode == "all" || *mode == "decrypt" || *mode == "encrypt") {
 		fmt.Println("Mode should be either : 'all', 'encrypt' or 'decrypt'")
@@ -198,6 +53,18 @@ func main() {
 		pricesToTest = []string{priceToEncryptTrimed}
 	}
 
+	// Create the DoubleClick Pricer
+	var pricer *Pricer
+	var err error
+	pricer, err = pricers.NewDoubleClickPricer(
+		*encryptionKey,
+		*integrityKey,
+		false,         // TODO : Handle this case allowing to pass it with cmd line
+		keyDecoding,
+		*scaleFactor,
+		*debug),
+	)
+
 	var encryptedPrice string
 	for _, priceToTest := range pricesToTest {
 
@@ -209,16 +76,27 @@ func main() {
 				fmt.Println("Error trying to parse price to encrypt, cannot convert %s to float.", priceToTest)
 				return
 			}
-			encryptedPrice = Encrypt(*encryptionKey, *integrityKey, *keyDecodingMode, *initializationVector, price, *scaleFactor, *debug)
+			encryptedPrice, err = pricer.Encrypt(*initializationVector, price, *debug)
+			if err != nil {
+				err = errors.New("Encryption failed. Error : %s", err)
+				fmt.Println(err)
+				return
+			}
 			fmt.Println("Encrypted price:", encryptedPrice)
 		}
 
 		if *mode == "all" || *mode == "decrypt" {
-			if encryptedPrice == "" && *mode == "decrypt" {
-				encryptedPrice = addBase64Padding(priceToTest)
-			}
 			fmt.Println("Encrypted price:", encryptedPrice)
-			decryptedPrice := Decrypt(*encryptionKey, *integrityKey, *keyDecodingMode, encryptedPrice, *scaleFactor)
+			var decryptedPrice float64
+			decryptedPrice, err = pricer.Decrypt(
+				encryptedPrice
+				*debug,
+			)
+			if err != nil {
+				err = errors.New("Decryption failed. Error : %s", err)
+				fmt.Println(err)
+				return
+			}
 			fmt.Println("Decrypted price:", decryptedPrice)
 		}
 	}
