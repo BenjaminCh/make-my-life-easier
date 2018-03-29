@@ -4,29 +4,47 @@ They are all ready to go command line tools :)
 
 ## Price encryption / decryption (Google Private Data specs)
 ### Usage examples
+#### Help
+```
+go run mmle.go help
+usage: mmle [<flags>] <command> [<args> ...]
+
+Flags:
+      --help     Show context-sensitive help (also try --help-long and --help-man).
+  -v, --verbose  Verbose mode.
+
+Commands:
+  help [<command>...]
+    Show help.
+
+  price-encryption [<flags>] <ekey> <ikey> <price>
+    Encrypt a price using a given algorithm.
+
+  price-decryption [<flags>] <ekey> <ikey> <price>
+    Decrypt a price using a given algorithm.
+
+  hex-key-generator [<keylength>]
+    Generate a random hex key of the specified length (by default: 64)
+```
 #### Decrypt only
 The command line below will try to decrypt the encrypted price passed in command line.
 ```
-go run google-private-data-encryption-test.go --encryptionkey=[YOUR_EKEY] --integritykey=[YOUR_IKEY] --price=[ENCRYPTED_PRICE] --mode=decrypt --keyDecodingMode=utf-8
+go run mmle.go price-decryption [YOUR_EKEY] [YOUR_IKEY] [ENCRYPTED_PRICE]
 ```
-#### Encrypt & Decrypt
-The command line below will try to encrypt and then decrypt the encrypted price passed in command line.
+#### Encrypt only
+The command line below will try to encrypt the clear price passed in command line.
 ```
-go run google-private-data-encryption-test.go --encryptionkey=[YOUR_EKEY] --integritykey=[YOUR_IKEY] --price=[CLEAR_PRICE] --mode=all --keyDecodingMode=hexa
+go run mmle.go price-encryption [YOUR_EKEY] [YOUR_IKEY] [CLEAR_PRICE]
 ```
 
 ## Hexa keys generation
 ### Usage examples
 The command line below will generate an hexa key of the desired length (by default, 64 bytes).
 ```
-go run hex-key-generator.go
-go run hex-key-generator.go --keylength=32
+go run mmle.go hex-key-generator
+go run mmle.go hex-key-generator --keylength=32
 ```
 
 ## Base64 to Base64 web safe and Base64 web safe to Base64
 ### Usage examples
-The commands lines below will convert a base64 string to a base 64 web safe string and vice versa.
-```
-go run base-64-web-safe.go --action=base64 --value=[YOUR_BASE64_WEBSAFE_STRING]
-go run base-64-web-safe.go --action=base64websafe --value=[YOUR_BASE64_STRING]
-```
+TODO
