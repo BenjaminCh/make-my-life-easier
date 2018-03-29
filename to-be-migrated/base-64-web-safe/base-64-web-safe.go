@@ -1,13 +1,13 @@
-package main
+package base64websafe
 
 import (
-	"strings"
-	"regexp"
 	"flag"
 	"fmt"
+	"regexp"
+	"strings"
 )
 
-func convertToBase64WebSafe(base64 string) (string) {
+func convertToBase64WebSafe(base64 string) string {
 
 	var base64WebSafe string
 
@@ -19,7 +19,7 @@ func convertToBase64WebSafe(base64 string) (string) {
 	return base64WebSafe
 }
 
-func convertToBase64(base64WebSafe string) (string) {
+func convertToBase64(base64WebSafe string) string {
 
 	var base64 string
 
@@ -32,7 +32,7 @@ func convertToBase64(base64WebSafe string) (string) {
 	return base64
 }
 
-func addBase64Padding(initialB64 string) (string) {
+func addBase64Padding(initialB64 string) string {
 	var base64 string
 
 	base64 = initialB64
@@ -43,7 +43,6 @@ func addBase64Padding(initialB64 string) (string) {
 
 	return base64
 }
-
 
 func main() {
 

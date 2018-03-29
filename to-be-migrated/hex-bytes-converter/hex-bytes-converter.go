@@ -1,11 +1,11 @@
-package main
+package hexbytesconverter
 
 import (
 	"encoding/hex"
-	"strconv"
-	"strings"
 	"flag"
 	"fmt"
+	"strconv"
+	"strings"
 )
 
 func convertHexaToBytes(key string) ([]byte, error) {
@@ -13,7 +13,7 @@ func convertHexaToBytes(key string) ([]byte, error) {
 	var k []byte
 
 	k, err = hex.DecodeString(key)
-	
+
 	if err != nil {
 		return nil, err
 	}
@@ -21,7 +21,7 @@ func convertHexaToBytes(key string) ([]byte, error) {
 	return k, nil
 }
 
-func convertBytesToHexa(key []byte) (string) {
+func convertBytesToHexa(key []byte) string {
 	var k string
 
 	k = hex.EncodeToString(key)
@@ -69,10 +69,10 @@ func main() {
 	var bytes []byte
 	var err error
 
-    if *action == "hextobytes" {
-        hexa = *value
-        bytes, err = convertHexaToBytes(hexa)
-    } else if *action == "bytestohex" {
+	if *action == "hextobytes" {
+		hexa = *value
+		bytes, err = convertHexaToBytes(hexa)
+	} else if *action == "bytestohex" {
 
 		bytes, err = parseBytesArrayFromInput(*value)
 		if err != nil {
@@ -80,21 +80,21 @@ func main() {
 			return
 		}
 		hexa = convertBytesToHexa(bytes)
-    }
+	}
 
-    fmt.Println("")
+	fmt.Println("")
 	fmt.Println("")
 
-    if err != nil {
-        fmt.Println("*** Error converting hexa ***")
-        fmt.Println("")
-        fmt.Println(err)
-    } else {
-        fmt.Println("*** Converted ***")
-        fmt.Println("")
-        fmt.Println("Value (hex format) : ", hexa)
-        fmt.Println("Value (byte array format) : ", bytes)
-    }
+	if err != nil {
+		fmt.Println("*** Error converting hexa ***")
+		fmt.Println("")
+		fmt.Println(err)
+	} else {
+		fmt.Println("*** Converted ***")
+		fmt.Println("")
+		fmt.Println("Value (hex format) : ", hexa)
+		fmt.Println("Value (byte array format) : ", bytes)
+	}
 
 	fmt.Println("")
 	fmt.Println("*********************")
