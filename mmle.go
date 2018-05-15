@@ -59,7 +59,7 @@ var (
 
 	// Hex key generator
 	hexKeyGeneratorCmd          = kingpin.Command(hexKeyGeneratorCmdValue, "Generate a random hex key of the specified length (by default: 64)")
-	hexKeyGeneratorKeyLengthArg = hexKeyGeneratorCmd.Arg(keyLengthArgValue, "Key Length").Default("32").Int64()
+	hexKeyGeneratorKeyLengthArg = hexKeyGeneratorCmd.Flag(keyLengthArgValue, "Key Length").Default("32").Int64()
 )
 
 func main() {
