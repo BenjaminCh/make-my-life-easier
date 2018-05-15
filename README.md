@@ -2,6 +2,20 @@
 A couple scripts I use on a daily basis to make my life easier.
 They are all ready to go command line tools :)
 
+## Installation
+### Preliminary
+- `go` needs to be installed, version 1.8 or above
+- `dep` needs to be installed, see https://github.com/golang/dep
+### Pulling the code
+- retrieve the code from the repo
+-- go get github.com/benjaminch/make-my-life-easier
+- or install the module + code
+-- go install github.com/benjaminch/make-my-life-easier
+### Launching the code
+- go to $GOPATH/src/github.com/benjaminch/make-my-life-easier
+- get dependencies: `dep ensure`
+- run `go run mmle.go help`
+
 ## Price encryption / decryption (Google Private Data specs)
 ### Usage examples
 #### Help
@@ -31,10 +45,49 @@ The command line below will try to decrypt the encrypted price passed in command
 ```
 go run mmle.go price-decryption [YOUR_EKEY] [YOUR_IKEY] [ENCRYPTED_PRICE]
 ```
+Details:
+```
+usage: mmle price-decryption [<flags>] <ekey> <ikey> <price>
+
+Decrypt a price using a given algorithm.
+
+Flags:
+      --help              Show context-sensitive help (also try --help-long and --help-man).
+  -v, --verbose           Verbose mode.
+      --algorithm=google  Name of the algorithm
+      --keystype=utf-8    Keys type
+      --keysb64           Keys are base 64.
+      --scale=1000000     Price scale factor
+
+Args:
+  <ekey>   Encryption key
+  <ikey>   Integrity key
+  <price>  Price to decrypt
+```
 #### Encrypt only
 The command line below will try to encrypt the clear price passed in command line.
 ```
 go run mmle.go price-encryption [YOUR_EKEY] [YOUR_IKEY] [CLEAR_PRICE]
+```
+Details:
+```
+usage: mmle price-encryption [<flags>] <ekey> <ikey> <price>
+
+Encrypt a price using a given algorithm.
+
+Flags:
+      --help              Show context-sensitive help (also try --help-long and --help-man).
+  -v, --verbose           Verbose mode.
+      --algorithm=google  Name of the algorithm
+      --keystype=utf-8    Keys type
+      --keysb64           Keys are base 64.
+      --scale=1000000     Price scale factor
+      --seed=""           Seed
+
+Args:
+  <ekey>   Encryption key
+  <ikey>   Integrity key
+  <price>  Price to encrypt
 ```
 ### Verbose mode
 The verbose mode describle the process step by steps.
@@ -64,6 +117,17 @@ The command line below will generate an hexa key of the desired length (by defau
 ```
 go run mmle.go hex-key-generator
 go run mmle.go hex-key-generator --keylength=32
+```
+Details:
+```
+usage: mmle hex-key-generator [<flags>]
+
+Generate a random hex key of the specified length (by default: 64)
+
+Flags:
+      --help          Show context-sensitive help (also try --help-long and --help-man).
+  -v, --verbose       Verbose mode.
+      --keylength=32  Key Length
 ```
 
 ## Base64 to Base64 web safe and Base64 web safe to Base64
