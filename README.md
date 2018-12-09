@@ -1,3 +1,5 @@
+[![Go Report Card](https://goreportcard.com/badge/github.com/benjaminch/make-my-life-easier)](https://goreportcard.com/report/github.com/benjaminch/make-my-life-easier)
+
 # make-my-life-easier
 A couple scripts I use on a daily basis to make my life easier.
 They are all ready to go command line tools :)
