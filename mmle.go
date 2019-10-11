@@ -42,7 +42,7 @@ var (
 	priceEncryptionIntegrityKeyArg     = priceEncryptionCmd.Arg(integrityKeyArgValue, "Integrity key").Required().String()
 	priceEncryptionPriceArg            = priceEncryptionCmd.Arg(priceArgValue, "Price to encrypt").Required().Float()
 	priceEncryptionAlgorithmNameArg    = priceEncryptionCmd.Flag(algorithmNameArgValue, "Name of the algorithm").Default("google").Enum("google")
-	priceEncryptionKeysTypeArg         = priceEncryptionCmd.Flag(keysTypeArgValue, "Keys type").Default("utf-8").Enum("utf-8", "hexa")
+	priceEncryptionKeysTypeArg         = priceEncryptionCmd.Flag(keysTypeArgValue, "Keys type").Default("hexa").Enum("utf-8", "hexa")
 	priceEncryptionKeysAreBase64Arg    = priceEncryptionCmd.Flag(keysAreBase64ArgValue, "Keys are base 64.").Default("false").Bool()
 	priceEncryptionPriceScaleFactorArg = priceEncryptionCmd.Flag(priceScaleFactorArgValue, "Price scale factor").Default("1000000").Float()
 	priceEncryptionSeedArg             = priceEncryptionCmd.Flag(seedArgValue, "Seed").Default("").String()
@@ -53,7 +53,7 @@ var (
 	priceDecryptionIntegrityKeyArg     = priceDecryptionCmd.Arg(integrityKeyArgValue, "Integrity key").Required().String()
 	priceDecryptionPriceArg            = priceDecryptionCmd.Arg(priceArgValue, "Price to decrypt").Required().String()
 	priceDecryptionAlgorithmNameArg    = priceDecryptionCmd.Flag(algorithmNameArgValue, "Name of the algorithm").Default("google").Enum("google")
-	priceDecryptionKeysTypeArg         = priceDecryptionCmd.Flag(keysTypeArgValue, "Keys type").Default("utf-8").Enum("utf-8", "hexa")
+	priceDecryptionKeysTypeArg         = priceDecryptionCmd.Flag(keysTypeArgValue, "Keys type").Default("hexa").Enum("utf-8", "hexa")
 	priceDecryptionKeysAreBase64Arg    = priceDecryptionCmd.Flag(keysAreBase64ArgValue, "Keys are base 64.").Default("false").Bool()
 	priceDecryptionPriceScaleFactorArg = priceDecryptionCmd.Flag(priceScaleFactorArgValue, "Price scale factor").Default("1000000").Float()
 
