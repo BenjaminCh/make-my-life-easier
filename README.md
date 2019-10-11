@@ -57,7 +57,7 @@ Flags:
       --help              Show context-sensitive help (also try --help-long and --help-man).
   -v, --verbose           Verbose mode.
       --algorithm=google  Name of the algorithm
-      --keystype=utf-8    Keys type
+      --keystype=hexa     Keys type
       --keysb64           Keys are base 64.
       --scale=1000000     Price scale factor
 
@@ -81,7 +81,7 @@ Flags:
       --help              Show context-sensitive help (also try --help-long and --help-man).
   -v, --verbose           Verbose mode.
       --algorithm=google  Name of the algorithm
-      --keystype=utf-8    Keys type
+      --keystype=hexa     Keys type
       --keysb64           Keys are base 64.
       --scale=1000000     Price scale factor
       --seed=""           Seed
