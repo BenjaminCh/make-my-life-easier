@@ -23,7 +23,7 @@
 
 [[constraint]]
   branch = "master"
-  name = "github.com/benjaminch/openrtb-pricers"
+  name = "github.com/benjaminch/pricers"
 
 [[constraint]]
   name = "gopkg.in/alecthomas/kingpin.v2"

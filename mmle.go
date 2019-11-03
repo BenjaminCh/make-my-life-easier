@@ -5,8 +5,8 @@ import (
 	"encoding/hex"
 	"fmt"
 
-	"github.com/benjaminch/openrtb-pricers/doubleclick"
-	pricerhelper "github.com/benjaminch/openrtb-pricers/helpers"
+	"github.com/benjaminch/pricers/doubleclick"
+	pricerhelper "github.com/benjaminch/pricers/helpers"
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
