@@ -6,16 +6,13 @@ They are all ready to go command line tools :)
 
 ## Installation
 ### Preliminary
-- `go` needs to be installed, version 1.8 or above
-- `dep` needs to be installed, see https://github.com/golang/dep
+- `go` needs to be installed, version 1.12 or above
 ### Pulling the code
 - retrieve the code from the repo
 -- go get github.com/benjaminch/make-my-life-easier
 - or install the module + code
 -- go install github.com/benjaminch/make-my-life-easier
 ### Launching the code
-- go to $GOPATH/src/github.com/benjaminch/make-my-life-easier
-- get dependencies: `dep ensure`
 - run `go run mmle.go help`
 
 ## Price encryption / decryption (Google Private Data specs)
